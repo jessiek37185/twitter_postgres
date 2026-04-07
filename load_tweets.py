@@ -103,7 +103,6 @@ def insert_tweet(connection,tweet):
 
     # insert tweet within a transaction;
     # this ensures that a tweet does not get "partially" loaded
-    connection.commit()
 
     with connection.begin() as trans:
 
@@ -140,6 +139,7 @@ def insert_tweet(connection,tweet):
 		,    :id_urls
 		,    :friends_count
 		,    :listed_count
+		,    :favourites_count
 		,    :statuses_count
 		,    :protected
 		,    :verified
@@ -229,7 +229,7 @@ def insert_tweet(connection,tweet):
 		VALUES (:in_reply_to_user_id)
 		ON CONFLICT DO NOTHING
 		''')
-            connection.execute(sql, {'in_reply_user_id': tweet['in_reply_to_user_id']})
+            connection.execute(sql, {'in_reply_to_user_id': tweet['in_reply_to_user_id']})
 
         # insert the tweet
         sql=sqlalchemy.sql.text(f'''
@@ -284,7 +284,7 @@ def insert_tweet(connection,tweet):
             'retweet_count':tweet['retweet_count'],
             'favorite_count':tweet['favorite_count'],
             'quote_count':tweet['quote_count'],
-            'withheld_copyright':remove_nulls(tweet['user']['withheld_copyright']) if 'withheld_copyright' in tweet['user'] else None,
+            'withheld_copyright':remove_nulls(tweet.get('withheld_copyright'),
             'withheld_in_countries':remove_nulls(tweet['user']['withheld_in_countries']) if 'withheld_in_countries' in tweet['user'] else None,
             'source':remove_nulls(tweet['source']),
             'text':remove_nulls(text),
@@ -343,28 +343,28 @@ def insert_tweet(connection,tweet):
             # use the ON CONFLICT DO NOTHING syntax
             sql=sqlalchemy.sql.text('''
                 INSERT INTO users (id_users)
-		VALUES (:id_users)
-		ON CONFLICT DO NOTHING
-		''')
-            connection.execute(sql, {sql, {'id_users': mention['id']})
+				VALUES (:id_users)
+			ON CONFLICT DO NOTHING
+			''')
+            connection.execute(sql, {'id_users': mention['id']})
 
             # insert into tweet_mentions
             sql=sqlalchemy.sql.text('''
-		INSERT INTO tweet_mentions (
+			INSERT INTO tweet_mentions (
 		    id_tweets,
 		    id_users
-		)
-		VALUES (
-		    :id_tweets,
-		    :id_users
-		)
-		ON CONFLICT DO NOTHING
-                ''')	
+			)
+			VALUES (
+		  	  :id_tweets,
+		  	  :id_users
+			)
+			ON CONFLICT DO NOTHING
+            ''')	
 
             res = connection.execute(sql,{
-		'id_tweets':tweet['id'],
-		'id_users':mention['id']
-		})
+				'id_tweets':tweet['id'],
+				'id_users':mention['id']
+			})
 
         ########################################
         # insert into the tweet_tags table
@@ -382,19 +382,19 @@ def insert_tweet(connection,tweet):
         for tag in tags:
             sql=sqlalchemy.sql.text('''
                 INSERT INTO tweet_tags (
-		    id_tweets,
-		    tag
-		)
-		VALUES (
-		    :id_tweets,
-		    :tag
-		)
-		ON CONFLICT DO NOTHING
-		''')
-            res = connection.execute(sql,{
-		'id_tweets':tweet['id'],
-		'tag':tag
-		})
+		    	id_tweets,
+		    	tag
+			)
+			VALUES (
+		  		:id_tweets,
+		    	:tag
+			)
+			ON CONFLICT DO NOTHING
+			''')
+        	res = connection.execute(sql,{
+				'id_tweets':tweet['id'],
+				'tag':tag
+			})
 
 
         ########################################
