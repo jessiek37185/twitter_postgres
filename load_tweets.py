@@ -136,6 +136,7 @@ def insert_tweet(connection,tweet):
 		VALUES
 		(    :id_users
 		,    :created_at
+		,    :updated_at
 		,    :id_urls
 		,    :friends_count
 		,    :listed_count
@@ -155,17 +156,17 @@ def insert_tweet(connection,tweet):
 	    'created_at':remove_nulls(tweet['created_at']),
 	    'updated_at':datetime.datetime.now(),
 	    'id_urls':user_id_urls,
-            'friends_count':tweet['user']['friends_count'],
-	    'listed_count':tweet['user']['favourites_count'],
+        'friends_count':tweet['user']['friends_count'],
+	    'listed_count':tweet['user']['listed_count'],
 	    'favourites_count':tweet['user']['favourites_count'],
 	    'statuses_count':tweet['user']['statuses_count'],
-            'protected':tweet['user']['protected'],
+        'protected':tweet['user']['protected'],
    	    'verified':tweet['user']['verified'],
 	    'screen_name':remove_nulls(tweet['user']['screen_name']),
 	    'name':remove_nulls(tweet['user']['name']),
 	    'location':remove_nulls(tweet['user']['location']),
 	    'description':remove_nulls(tweet['user']['description']),
-	    'withheald_in_countries':remove_nulls(tweet['user']['withheld_in_countries'])
+	    'withheld_in_countries':remove_nulls(tweet['user']['withheld_in_countries'])
             })
 
         ########################################
@@ -228,15 +229,15 @@ def insert_tweet(connection,tweet):
 		VALUES (:in_reply_to_user_id)
 		ON CONFLICT DO NOTHING
 		''')
-            connection.execute(sql, {'in_reply_user_id': tweet['in_reply_to_user_id']}
+            connection.execute(sql, {'in_reply_user_id': tweet['in_reply_to_user_id']})
 
         # insert the tweet
         sql=sqlalchemy.sql.text(f'''
             INSERT INTO tweets
                 (    id_tweets
                 ,    id_users
-		,    created_at,
-		,    in_reply_to_status_id
+				,    created_at,
+				,    in_reply_to_status_id
                 ,    in_reply_to_user_id
                 ,    quoted_status_id
                 ,    retweet_count,
@@ -248,23 +249,23 @@ def insert_tweet(connection,tweet):
                 ,    text
                 ,    country_code
                 ,    state_code
-		,    lang
-		,    place_name
-		,    geo
+				,    lang
+				,    place_name
+				,    geo
                 )
                 VALUES
                 (    :id_tweets	
-		,    :id_users
+				,    :id_users
                 ,    :created_at
                 ,    :in_reply_to_status_id
                 ,    :in_reply_to_user_id
                 ,    :quoted_status_id
                 ,    :retweet_count
-		,    :favorite_count
-		,    :withheld_copyright
-		,    :withheld_in_countries
-		,    :source
-		,    :text
+				,    :favorite_count
+				,    :withheld_copyright
+				,    :withheld_in_countries
+				,    :source
+				,    :text
                 ,    :country_code
                 ,    :state_code
                 ,    :lang
@@ -277,7 +278,7 @@ def insert_tweet(connection,tweet):
             'id_tweets':tweet['id'],
             'id_users':tweet['user']['id'],
             'created_at':remove_nulls(tweet['created_at']),
-	    'in_reply_tostatus_id':tweet['in_reply_to_status_id'],
+	        'in_reply_to_status_id':tweet['in_reply_to_status_id'],
             'in_reply_to_user_id':tweet['in_reply_to_user_id'],
             'quoted_status_id':tweet.get('quoted_status_id',None),
             'retweet_count':tweet['retweet_count'],
@@ -345,7 +346,7 @@ def insert_tweet(connection,tweet):
 		VALUES (:id_users)
 		ON CONFLICT DO NOTHING
 		''')
-            connection.execute(sql, {sql, {'id_users':mention['id']})
+            connection.execute(sql, {sql, {'id_users': mention['id']})
 
             # insert into tweet_mentions
             sql=sqlalchemy.sql.text('''
