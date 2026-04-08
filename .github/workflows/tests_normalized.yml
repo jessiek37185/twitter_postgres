@@ -1,4 +1,4 @@
-ename: tests_normalized
+name: tests_normalized
 on:
   push:
     branches: ['*']
