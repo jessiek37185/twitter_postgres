@@ -2,9 +2,6 @@
 
 failed=false
 
-export PGPASSWORD=pass
-PORT=${PGPORT:-5432}
-
 mkdir -p results
 
 for problem in sql/*; do
@@ -12,7 +9,8 @@ for problem in sql/*; do
     problem_id=$(basename ${problem%.sql})
     result="results/$problem_id.out"
     expected="expected/$problem_id.out"
-    psql -h localhost -p $PORT -U postgres -d postgres < $problem > $result
+    psql -h localhost -p 5435 -U postgres -d postgres < $problem > $result
+    psql -h localhost -p 5436 -U postgres -d postgres < $problem > $result
     DIFF=$(diff -B $expected $result)
     if [ -z "$DIFF" ]; then
         echo pass
