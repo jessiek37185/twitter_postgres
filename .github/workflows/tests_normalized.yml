@@ -1,4 +1,4 @@
-name: tests_normalized
+enamex: tests_normalized
 on:
   push:
     branches: ['*']
@@ -20,4 +20,5 @@ jobs:
         docker ps -a
         until pg_isready -h localhost -p 5436; do sleep 1; done
         sh load_tweets.sh
-        PGPORT=5436 bash run_tests.sh
+        export PGPORT=5436 
+        bash run_tests.sh
