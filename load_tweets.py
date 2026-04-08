@@ -103,6 +103,7 @@ def insert_tweet(connection,tweet):
 
     # insert tweet within a transaction;
     # this ensures that a tweet does not get "partially" loaded
+    connection.commit()
 
     with connection.begin() as trans:
 
@@ -164,7 +165,7 @@ def insert_tweet(connection,tweet):
             'screen_name':remove_nulls(tweet['user']['screen_name']),
             'name':remove_nulls(tweet['user']['name']),
             'description':remove_nulls(tweet['user']['description']),
-            'withheld_in_countries':remove_nulls(tweet['user']['withheld_in_countries'])
+            'withheld_in_countries':remove_nulls(tweet['user'].get('withheld_in_countries'))
         })
 
         ########################################
