@@ -9,7 +9,7 @@ for problem in sql/*; do
     problem_id=$(basename ${problem%.sql})
     result="results/$problem_id.out"
     expected="expected/$problem_id.out"
-    psql -h localhost -p 5435 -U postgres -d postgres < $problem > $result
+    PGPASSWORD=pass psql -h localhost -p $PGPORT -U postgres -d postgres < $problem > $result
     DIFF=$(diff -B $expected $result)
     if [ -z "$DIFF" ]; then
         echo pass
