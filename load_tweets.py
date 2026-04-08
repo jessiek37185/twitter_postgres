@@ -234,7 +234,7 @@ def insert_tweet(connection,tweet):
             INSERT INTO tweets
                 (    id_tweets
                 ,    id_users
-				,    created_at,
+				,    created_at
 				,    in_reply_to_status_id
                 ,    in_reply_to_user_id
                 ,    quoted_status_id
@@ -260,6 +260,7 @@ def insert_tweet(connection,tweet):
                 ,    :quoted_status_id
                 ,    :retweet_count
 				,    :favorite_count
+				,    :quote_count
 				,    :withheld_copyright
 				,    :withheld_in_countries
 				,    :source
@@ -290,7 +291,7 @@ def insert_tweet(connection,tweet):
             'state_code':remove_nulls(state_code),
             'lang':remove_nulls(tweet['lang']),
             'place_name':remove_nulls(place_name),
-            'geo':f"{geo_str}({geo_coords})"
+            'geo':f"{geo_str}({geo_coords})" if geo_str else None
         })
 
 
@@ -389,7 +390,7 @@ def insert_tweet(connection,tweet):
 				)
 				ON CONFLICT DO NOTHING
 			''')
-        	res = connection.execute(sql,{
+			res = connection.execute(sql,{
 				'id_tweets':tweet['id'],
 				'tag':tag
 			})
