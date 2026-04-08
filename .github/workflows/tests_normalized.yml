@@ -18,6 +18,6 @@ jobs:
         git submodule update
         docker compose up -d --build
         docker ps -a
-        sleep 60
+        until pg_isready -h localhost -p 5436; do sleep 1; done
         sh load_tweets.sh
         PGPORT=5436 bash run_tests.sh
