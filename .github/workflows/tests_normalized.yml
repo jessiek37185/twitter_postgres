@@ -1,4 +1,4 @@
-enamex: tests_normalized
+ename: tests_normalized
 on:
   push:
     branches: ['*']
