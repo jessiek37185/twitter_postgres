@@ -20,4 +20,5 @@ jobs:
         docker ps -a
         until pg_isready -h localhost -p 5435; do sleep 1; done
         sh load_tweets.sh
-        PGPOORT=5435 bash run_tests.sh
+        export PGPOORT=5435 
+        bash run_tests.sh
